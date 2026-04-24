@@ -72,3 +72,11 @@ When asked to commit, do not add the `Co-Authored-By: Claude` line — the proje
 - Desktop dev loads modules from `http://localhost:3000/@fs/...` — a Vite dev server fronting the renderer. Errors reference the compiled `dist/esm/*.js`; the fix goes in the `src/*.ts` counterpart.
 - Don't add `Co-Authored-By` trailers or "Generated with Claude Code" lines to commits, PRs, or code comments. The project uses DCO sign-off only.
 - License header: every new source file in `apps/` and `packages/` gets the GPL-3.0 header — see any existing `.ts` file for the template. `eslint-plugin-license-header` will flag omissions.
+
+<!-- convex-ai-start -->
+This fork uses [Convex](https://convex.dev) for sync + file storage (replacing the upstream HTTP sync server). The Convex project lives at `servers/convex/`.
+
+When working on Convex code, **always read `servers/convex/convex/_generated/ai/guidelines.md` first** for rules that override training-data assumptions about Convex APIs. Run `npx convex dev` from `servers/convex/` to regenerate `_generated/` after schema changes.
+
+**E2EE is disabled** on this fork — sync payloads are plaintext. See `servers/convex/README.md` for the milestone plan.
+<!-- convex-ai-end -->

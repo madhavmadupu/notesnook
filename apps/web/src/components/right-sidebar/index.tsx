@@ -23,6 +23,10 @@ import { ScopedThemeProvider } from "../theme-provider";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { Calendar, Close, Icon, Robot } from "../icons";
 import { DayPicker } from "../day-picker";
+import { useWindowControls } from "../../hooks/use-window-controls";
+import { isMac } from "../../utils/platform";
+import useMobile from "../../hooks/use-mobile";
+import useTablet from "../../hooks/use-tablet";
 
 type RightSidebarTab = {
   id: string;
@@ -50,6 +54,15 @@ export function RightSidebar() {
   const activeTabId = useAppStore((s) => s.rightSidebarTab);
   const setRightSidebarTab = useAppStore((s) => s.setRightSidebarTab);
   const toggleRightSidebar = useAppStore((s) => s.toggleRightSidebar);
+  const { isFullscreen, hasNativeWindowControls } = useWindowControls();
+  const isMobile = useMobile();
+  const isTablet = useTablet();
+  const needsWindowControlsSpace =
+    hasNativeWindowControls &&
+    !isMac() &&
+    !isFullscreen &&
+    !isMobile &&
+    !isTablet;
 
   const activeTab =
     TABS.find((t) => t.id === activeTabId) ?? TABS[0];
@@ -71,8 +84,11 @@ export function RightSidebar() {
         sx={{
           alignItems: "center",
           justifyContent: "space-between",
-          px: 2,
+          pl: 2,
           py: 1,
+          pr: needsWindowControlsSpace
+            ? `calc(100vw - env(titlebar-area-width) + 8px)`
+            : 2,
           borderBottom: "1px solid var(--separator)",
           flexShrink: 0,
           gap: 1

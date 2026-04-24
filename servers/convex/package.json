@@ -1,0 +1,19 @@
+{
+  "name": "@notesnook/convex-server",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Convex backend for Notesnook sync and file storage",
+  "type": "module",
+  "scripts": {
+    "start": "convex dev",
+    "deploy": "convex deploy",
+    "codegen": "convex codegen"
+  },
+  "dependencies": {
+    "convex": "^1.17.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  },
+  "license": "GPL-3.0-or-later"
+}
