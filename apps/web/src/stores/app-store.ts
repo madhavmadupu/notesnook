@@ -67,6 +67,8 @@ class AppStore extends BaseStore<AppStore> {
   isFocusMode = false;
   isListPaneVisible = true;
   isNavPaneCollapsed = false;
+  isRightSidebarVisible = Config.get("isRightSidebarVisible", false);
+  rightSidebarTab = Config.get<string>("rightSidebarTab", "ai");
   isVaultCreated = false;
   isAutoSyncEnabled = Config.get("autoSyncEnabled", true);
   isSyncEnabled = Config.get("syncEnabled", true);
@@ -167,6 +169,21 @@ class AppStore extends BaseStore<AppStore> {
       (state) =>
         (state.isListPaneVisible = booleanState ?? !state.isListPaneVisible)
     );
+  };
+
+  toggleRightSidebar = (booleanState?: boolean) => {
+    this.set((state) => {
+      const next = booleanState ?? !state.isRightSidebarVisible;
+      state.isRightSidebarVisible = next;
+      Config.set("isRightSidebarVisible", next);
+    });
+  };
+
+  setRightSidebarTab = (tab: string) => {
+    this.set((state) => {
+      state.rightSidebarTab = tab;
+      Config.set("rightSidebarTab", tab);
+    });
   };
 
   refresh = async () => {
