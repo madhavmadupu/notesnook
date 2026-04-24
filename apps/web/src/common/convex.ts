@@ -17,19 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { getAuthUserId } from "@convex-dev/auth/server";
-import type { QueryCtx, MutationCtx } from "../_generated/server";
+import { ConvexReactClient } from "convex/react";
 
-// Returns the scoping key for every per-user row.
-//
-// Derived from the authenticated user id issued by Convex Auth. Callers
-// that aren't signed in see a thrown error — no data leakage via
-// unauthenticated access. The key is prefixed so we can distinguish
-// identity providers if we ever add OAuth alongside password.
-export async function getUserKey(
-  ctx: QueryCtx | MutationCtx
-): Promise<string> {
-  const userId = await getAuthUserId(ctx);
-  if (!userId) throw new Error("Not authenticated");
-  return `convex:${userId}`;
-}
+// Vite only exposes env vars prefixed with the envPrefix (`NN_`).
+// See apps/web/vite.config.ts.
+const CONVEX_URL = import.meta.env.NN_CONVEX_URL as string | undefined;
+
+export const convex = CONVEX_URL
+  ? new ConvexReactClient(CONVEX_URL)
+  : null;
+
+export const isConvexConfigured = !!convex;

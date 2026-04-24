@@ -17,19 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { getAuthUserId } from "@convex-dev/auth/server";
-import type { QueryCtx, MutationCtx } from "../_generated/server";
+import Password from "@convex-dev/auth/providers/Password";
+import { convexAuth } from "@convex-dev/auth/server";
 
-// Returns the scoping key for every per-user row.
-//
-// Derived from the authenticated user id issued by Convex Auth. Callers
-// that aren't signed in see a thrown error — no data leakage via
-// unauthenticated access. The key is prefixed so we can distinguish
-// identity providers if we ever add OAuth alongside password.
-export async function getUserKey(
-  ctx: QueryCtx | MutationCtx
-): Promise<string> {
-  const userId = await getAuthUserId(ctx);
-  if (!userId) throw new Error("Not authenticated");
-  return `convex:${userId}`;
-}
+// Password provider only for this fork. Add OAuth (Google, GitHub, etc.)
+// by appending to `providers` — they share the `users` table.
+export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
+  providers: [Password]
+});

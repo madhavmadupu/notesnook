@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { authTables } from "@convex-dev/auth/server";
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
@@ -75,6 +76,12 @@ const contentDoc = {
 };
 
 export default defineSchema({
+  // `@convex-dev/auth` tables: users, authSessions, authAccounts,
+  // authRefreshTokens, authVerificationCodes, authVerifiers, authRateLimits.
+  // Do not touch these directly; use the helpers from
+  // `@convex-dev/auth/server` and `getAuthUserId` instead.
+  ...authTables,
+
   notes: defineTable(noteDoc)
     .index("by_userKey_and_id", ["userKey", "id"])
     .index("by_userKey_and_dateModified", ["userKey", "dateModified"]),

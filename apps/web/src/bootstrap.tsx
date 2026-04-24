@@ -102,6 +102,11 @@ const routes = {
     component: () => import("./views/auth"),
     props: { route: "login:email" }
   },
+  // New Convex-Auth-backed sign-in / sign-up. Coexists with the old
+  // /login and /signup until the Streetwriters auth flow is ripped out.
+  "/signin": {
+    component: () => import("./views/signin")
+  },
   default: { component: () => import("./app"), props: null }
 } as const;
 

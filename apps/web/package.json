@@ -8,6 +8,7 @@
   "repository": "https://github.com/streetwriters/notesnook",
   "license": "GPL-3.0-or-later",
   "dependencies": {
+    "@convex-dev/auth": "^0.0.91",
     "@dnd-kit/core": "^6.1.0",
     "@dnd-kit/modifiers": "^7.0.0",
     "@dnd-kit/sortable": "^8.0.0",
@@ -48,6 +49,7 @@
     "axios": "^1.7.9",
     "clipboard-polyfill": "4.1.0",
     "comlink": "^4.3.1",
+    "convex": "^1.36.1",
     "cronosjs": "^1.7.1",
     "dayjs": "1.11.13",
     "diffblazer": "^1.0.1",
