@@ -100,7 +100,7 @@ function spawnAndWaitUntil(cmd, cwd, predicate) {
     const s = spawn(cmd[0], cmd.slice(1), {
       cwd,
       env: ENV,
-      shell: false
+      shell: process.platform === "win32"
     });
 
     RUNNING_PROCESSES.push(s);
@@ -135,7 +135,7 @@ function execAsync(cmd, args, restartable, onExit) {
     const proc = spawn(cmd, args, {
       stdio: "inherit",
       env: ENV,
-      shell: false
+      shell: process.platform === "win32"
     });
 
     const array = restartable ? RESTARTABLE_PROCESSES : RUNNING_PROCESSES;
