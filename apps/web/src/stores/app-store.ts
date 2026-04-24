@@ -68,7 +68,7 @@ class AppStore extends BaseStore<AppStore> {
   isListPaneVisible = true;
   isNavPaneCollapsed = false;
   isRightSidebarVisible = Config.get("isRightSidebarVisible", false);
-  rightSidebarTab = Config.get<string>("rightSidebarTab", "ai");
+  rightSidebarTab = Config.get<string>("rightSidebarTab", "calendar");
   isVaultCreated = false;
   isAutoSyncEnabled = Config.get("autoSyncEnabled", true);
   isSyncEnabled = Config.get("syncEnabled", true);

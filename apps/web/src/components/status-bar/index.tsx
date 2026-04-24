@@ -30,7 +30,8 @@ import {
   Icon,
   Unlock,
   CellphoneLock,
-  ConsoleLine
+  ConsoleLine,
+  DockRight
 } from "../icons";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useAppStore } from "../../stores/app-store";
@@ -54,6 +55,10 @@ function StatusBar() {
   const statuses = useStatus();
   const updateStatus = useAutoUpdater();
   const isFocusMode = useAppStore((state) => state.isFocusMode);
+  const isRightSidebarVisible = useAppStore(
+    (state) => state.isRightSidebarVisible
+  );
+  const toggleRightSidebar = useAppStore((state) => state.toggleRightSidebar);
   const { isVaultLocked, lockVault } = useVault();
   const { activeCredentials, relock } = useKeyStore();
 
@@ -212,7 +217,29 @@ function StatusBar() {
           )}
         </Flex>
       )}
-      <EditorFooter />
+      <Flex sx={{ alignItems: "center", gap: "small" }}>
+        {!isFocusMode && (
+          <Button
+            variant="statusitem"
+            onClick={() => toggleRightSidebar()}
+            sx={{
+              alignItems: "center",
+              justifyContent: "center",
+              display: "flex",
+              color: isRightSidebarVisible ? "accent" : "paragraph",
+              height: "100%"
+            }}
+            title="Toggle right sidebar"
+            data-test-id="toggle-right-sidebar"
+          >
+            <DockRight
+              size={12}
+              color={isRightSidebarVisible ? "accent" : undefined}
+            />
+          </Button>
+        )}
+        <EditorFooter />
+      </Flex>
     </ScopedThemeProvider>
   );
 }

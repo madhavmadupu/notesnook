@@ -29,6 +29,7 @@ import NavigationMenu from "./components/navigation-menu";
 import StatusBar from "./components/status-bar";
 import { FlexScrollContainer } from "./components/scroll-container";
 import CachedRouter from "./components/cached-router";
+import { RightSidebar } from "./components/right-sidebar";
 import { WebExtensionRelay } from "./utils/web-extension-relay";
 import {
   Pane,
@@ -140,6 +141,9 @@ export default App;
 function DesktopAppContents() {
   const isFocusMode = useStore((store) => store.isFocusMode);
   const isListPaneVisible = useStore((store) => store.isListPaneVisible);
+  const isRightSidebarVisible = useStore(
+    (store) => store.isRightSidebarVisible
+  );
   const isTablet = useTablet();
   const navPane = useRef<SplitPaneImperativeHandle>(null);
 
@@ -255,6 +259,19 @@ function DesktopAppContents() {
           >
             {<HashRouter />}
           </Pane>
+          {isFocusMode || !isRightSidebarVisible ? null : (
+            <Pane
+              id="right-sidebar-pane"
+              className="right-sidebar-pane"
+              initialSize={360}
+              minSize={280}
+              maxSize={600}
+              snapSize={240}
+              style={{ display: "flex" }}
+            >
+              <RightSidebar />
+            </Pane>
+          )}
         </SplitPane>
       </Flex>
       <StatusBar />

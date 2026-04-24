@@ -23,6 +23,7 @@ import {
   ArrowLeft,
   ArrowRight,
   Cross,
+  DockRight,
   Icon,
   Lock,
   NewTab,
@@ -111,6 +112,9 @@ export function EditorActionBar() {
     (store) => store.arePropertiesVisible
   );
   const isTOCVisible = useEditorStore((store) => store.isTOCVisible);
+  const isRightSidebarVisible = useAppStore(
+    (store) => store.isRightSidebarVisible
+  );
   const monographs = useMonographStore((store) => store.monographs);
   const isNotePublished =
     activeSession &&
@@ -191,6 +195,14 @@ export function EditorActionBar() {
         !isFocusMode,
       onClick: () => useEditorStore.getState().toggleProperties(),
       toggled: arePropertiesVisible
+    },
+    {
+      title: "Sidebar",
+      icon: DockRight,
+      enabled: !isFocusMode,
+      hideOnMobile: true,
+      onClick: () => useAppStore.getState().toggleRightSidebar(),
+      toggled: isRightSidebarVisible
     },
     ...getWindowControls(
       hasNativeWindowControls,

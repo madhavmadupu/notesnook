@@ -3,7 +3,8 @@
     "allow": [
       "Bash(npm run *)",
       "Bash(netstat -ano)",
-      "Bash(xargs grep *)"
+      "Bash(xargs grep *)",
+      "Bash(npx tsc *)"
     ]
   }
 }
