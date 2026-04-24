@@ -17,12 +17,21 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Password } from "@convex-dev/auth/providers/Password";
-import { convexAuth } from "@convex-dev/auth/server";
+import { getAuthUserId } from "@convex-dev/auth/server";
+import { query } from "./_generated/server";
 
-// Password provider only for this fork. `verify` is intentionally omitted
-// so no email verification is required — signup signs you in immediately.
-// Add OAuth (Google, GitHub) later by appending to `providers`.
-export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
-  providers: [Password()]
+export const currentUser = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+    const user = await ctx.db.get(userId);
+    if (!user) return null;
+    return {
+      _id: user._id,
+      email: user.email ?? null,
+      name: user.name ?? null,
+      image: user.image ?? null
+    };
+  }
 });

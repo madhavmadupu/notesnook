@@ -34,6 +34,9 @@ import AppLock from "./views/app-lock";
 import { Text } from "@theme-ui/components";
 import { EV, EVENTS } from "@notesnook/core";
 import { useEffect, useState } from "react";
+import { ConvexAuthProvider } from "@convex-dev/auth/react";
+import { Authenticated, AuthLoading, Unauthenticated } from "convex/react";
+import { convex, isConvexConfigured } from "./common/convex";
 
 export async function startApp(children?: React.ReactNode) {
   const rootElement = document.getElementById("root");
@@ -55,7 +58,7 @@ export async function startApp(children?: React.ReactNode) {
 
     await useKeyStore.getState().init({ persistence });
 
-    root.render(
+    const tree = (
       <>
         <TitleBar force={isAuthRouteActive()} />
         <ErrorBoundary>
@@ -65,18 +68,28 @@ export async function startApp(children?: React.ReactNode) {
               sx={{ bg: "background", flex: 1, overflow: "hidden" }}
             >
               <AppLock>
-                <RouteWrapper
-                  Component={Component}
-                  path={path}
-                  routeProps={props}
-                  persistence={persistence}
-                />
+                <AuthGate path={path}>
+                  <RouteWrapper
+                    Component={Component}
+                    path={path}
+                    routeProps={props}
+                    persistence={persistence}
+                  />
+                </AuthGate>
               </AppLock>
               {children}
             </BaseThemeProvider>
           </GlobalErrorHandler>
         </ErrorBoundary>
       </>
+    );
+
+    root.render(
+      convex && isConvexConfigured ? (
+        <ConvexAuthProvider client={convex}>{tree}</ConvexAuthProvider>
+      ) : (
+        tree
+      )
     );
   } catch (e) {
     console.error(e);
@@ -153,6 +166,39 @@ function RouteWrapper(props: {
     );
   performance.mark("render:app");
   return <Component route={routeProps?.route || "login:email"} />;
+}
+
+function AuthGate({
+  path,
+  children
+}: {
+  path: Routes;
+  children: React.ReactNode;
+}) {
+  // /signin and /signout handle their own auth lifecycle.
+  // Without Convex configured, behave as before this change.
+  if (
+    path === "/signin" ||
+    path === "/signout" ||
+    !isConvexConfigured
+  )
+    return <>{children}</>;
+  return (
+    <>
+      <AuthLoading>{null}</AuthLoading>
+      <Unauthenticated>
+        <RedirectToSignIn />
+      </Unauthenticated>
+      <Authenticated>{children}</Authenticated>
+    </>
+  );
+}
+
+function RedirectToSignIn() {
+  useEffect(() => {
+    window.location.replace("/signin");
+  }, []);
+  return null;
 }
 
 if (import.meta.hot) import.meta.hot.accept();

@@ -74,22 +74,13 @@ const routes = {
     component: () => import("./views/email-confirmed"),
     props: {}
   },
-  "/signup": {
-    component: () => import("./views/auth"),
-    props: { route: "signup" }
-  },
-  "/sessionexpired": {
-    component: () => import("./views/auth"),
-    props: { route: "sessionExpiry" }
-  },
-  "/login": {
-    component: () => import("./views/auth"),
-    props: { route: "login:email" }
-  },
-  "/login/password": {
-    component: () => import("./views/auth"),
-    props: { route: "login:email" }
-  },
+  // Legacy Streetwriters flows — redirected to /signin in this fork.
+  // Keep the paths registered (not pointing at views/auth) so external
+  // links don't 404; the redirect happens in getRoute() below.
+  "/signup": { component: () => import("./views/signin") },
+  "/sessionexpired": { component: () => import("./views/signin") },
+  "/login": { component: () => import("./views/signin") },
+  "/login/password": { component: () => import("./views/signin") },
   "/recover": {
     component: () => import("./views/auth"),
     props: { route: "recover" }
@@ -106,6 +97,9 @@ const routes = {
   // /login and /signup until the Streetwriters auth flow is ripped out.
   "/signin": {
     component: () => import("./views/signin")
+  },
+  "/signout": {
+    component: () => import("./views/signout")
   },
   default: { component: () => import("./app"), props: null }
 } as const;
@@ -151,15 +145,19 @@ function fallbackRoute(): RouteWithPath {
   return { route: routes.default, path: "default" };
 }
 
-function redirectToRegistration(path: Routes): RouteWithPath<AuthProps> | null {
-  if (!IS_TESTING && !shouldSkipInitiation() && !routes[path]) {
-    window.history.replaceState({}, "", makeURL("/signup", getCurrentHash()));
-    return { route: routes["/signup"], path: "/signup" };
-  }
+function redirectToRegistration(
+  _path: Routes
+): RouteWithPath<AuthProps> | RouteWithPath | null {
+  // Gating moved to AuthGate in root.tsx — it can read the live Convex Auth
+  // state, which this sync function cannot. Unknown paths now fall through
+  // to the default app route; unauthenticated users get redirected to
+  // /signin by AuthGate once React mounts.
   return null;
 }
 
-function isSessionExpired(path: Routes): RouteWithPath<AuthProps> | null {
+function isSessionExpired(
+  path: Routes
+): RouteWithPath<AuthProps> | RouteWithPath | null {
   const isSessionExpired = Config.get("sessionExpired", false);
   if (isSessionExpired && !sessionExpiryExceptions.includes(path)) {
     // logger.info(`User session has expired. Routing to /sessionexpired`);
@@ -169,7 +167,10 @@ function isSessionExpired(path: Routes): RouteWithPath<AuthProps> | null {
       "",
       makeURL("/sessionexpired", getCurrentHash())
     );
-    return { route: routes["/sessionexpired"], path: "/sessionexpired" };
+    return {
+      route: routes["/sessionexpired"],
+      path: "/sessionexpired"
+    } as RouteWithPath;
   }
   return null;
 }

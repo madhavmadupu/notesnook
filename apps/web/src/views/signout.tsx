@@ -17,12 +17,27 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Password } from "@convex-dev/auth/providers/Password";
-import { convexAuth } from "@convex-dev/auth/server";
+import { useEffect } from "react";
+import { useAuthActions } from "@convex-dev/auth/react";
 
-// Password provider only for this fork. `verify` is intentionally omitted
-// so no email verification is required — signup signs you in immediately.
-// Add OAuth (Google, GitHub) later by appending to `providers`.
-export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
-  providers: [Password()]
-});
+// Dedicated sign-out route — Notesnook's existing logout() only clears the
+// Streetwriters session, not Convex Auth. Until the in-app user menu is
+// wired to call both, navigate here to end a session cleanly.
+export default function SignOut() {
+  const { signOut } = useAuthActions();
+  useEffect(() => {
+    signOut().finally(() => window.location.replace("/signin"));
+  }, [signOut]);
+  return (
+    <div
+      style={{
+        maxWidth: 360,
+        margin: "80px auto",
+        padding: "0 20px",
+        fontFamily: "system-ui, sans-serif"
+      }}
+    >
+      Signing out…
+    </div>
+  );
+}

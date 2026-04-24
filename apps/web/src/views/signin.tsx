@@ -17,22 +17,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { FormEvent, useState } from "react";
-import {
-  ConvexAuthProvider,
-  useAuthActions
-} from "@convex-dev/auth/react";
+import { FormEvent, useEffect, useState } from "react";
+import { useAuthActions } from "@convex-dev/auth/react";
 import { Authenticated, AuthLoading, Unauthenticated } from "convex/react";
-import { convex, isConvexConfigured } from "../common/convex";
+import { isConvexConfigured } from "../common/convex";
 
-// Minimal standalone Convex Auth screen used while the rest of the
-// Notesnook UI still runs on the (broken) Streetwriters auth flow.
-// App-wide wiring (route guards, persistent session, user store) lands
-// in M3c. This view only proves end-to-end: signup → signin → signout.
+// Convex Auth screen. The ConvexAuthProvider is mounted one level up in
+// root.tsx so `Authenticated`/`Unauthenticated`/`useAuthActions` work here
+// without an inner provider.
 export default function SignIn() {
-  if (!convex || !isConvexConfigured) return <MissingConvexUrl />;
+  if (!isConvexConfigured) return <MissingConvexUrl />;
   return (
-    <ConvexAuthProvider client={convex}>
+    <>
       <AuthLoading>
         <Centered>Loading…</Centered>
       </AuthLoading>
@@ -40,10 +36,20 @@ export default function SignIn() {
         <SignInForm />
       </Unauthenticated>
       <Authenticated>
-        <SignedInPlaceholder />
+        <RedirectToApp />
       </Authenticated>
-    </ConvexAuthProvider>
+    </>
   );
+}
+
+function RedirectToApp() {
+  // After successful signup / signin, kick into the main app. The authenticated
+  // session is stored in localStorage by Convex Auth and is picked up by the
+  // AuthGate wrapper in root.tsx on the next page load.
+  useEffect(() => {
+    window.location.replace("/");
+  }, []);
+  return <Centered>Signed in. Loading app…</Centered>;
 }
 
 function SignInForm() {
@@ -116,22 +122,6 @@ function SignInForm() {
         {mode === "signIn"
           ? "Need an account? Sign up"
           : "Have an account? Sign in"}
-      </button>
-    </Centered>
-  );
-}
-
-function SignedInPlaceholder() {
-  const { signOut } = useAuthActions();
-  return (
-    <Centered>
-      <h1>Signed in</h1>
-      <p style={{ color: "#666" }}>
-        Convex Auth session established. Notesnook app wiring still pending —
-        the main app doesn&apos;t consume this session yet.
-      </p>
-      <button type="button" onClick={() => signOut()} style={primaryButtonStyle}>
-        Sign out
       </button>
     </Centered>
   );
