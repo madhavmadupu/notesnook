@@ -37,6 +37,7 @@ import { useEffect, useState } from "react";
 import { ConvexAuthProvider } from "@convex-dev/auth/react";
 import { Authenticated, AuthLoading, Unauthenticated } from "convex/react";
 import { convex, isConvexConfigured } from "./common/convex";
+import { BridgeConvexIdentity } from "./components/convex-bridge";
 
 export async function startApp(children?: React.ReactNode) {
   const rootElement = document.getElementById("root");
@@ -189,7 +190,10 @@ function AuthGate({
       <Unauthenticated>
         <RedirectToSignIn />
       </Unauthenticated>
-      <Authenticated>{children}</Authenticated>
+      <Authenticated>
+        <BridgeConvexIdentity />
+        {children}
+      </Authenticated>
     </>
   );
 }

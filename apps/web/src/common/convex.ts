@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { ConvexReactClient } from "convex/react";
+import { api } from "../../../../servers/convex/convex/_generated/api";
 
 // Vite only exposes env vars prefixed with the envPrefix (`NN_`).
 // See apps/web/vite.config.ts.
@@ -28,3 +29,5 @@ export const convex = CONVEX_URL
   : null;
 
 export const isConvexConfigured = !!convex;
+
+export { api };
