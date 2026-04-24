@@ -48,6 +48,19 @@ export class SQLite {
     this.sqlite = require("better-sqlite3-multiple-ciphers")(
       filePath
     ).unsafeMode(true);
+
+    this.sqlite!.function(
+      "regexp",
+      { deterministic: true },
+      (pattern: unknown, value: unknown) => {
+        if (value == null || pattern == null) return 0;
+        try {
+          return new RegExp(String(pattern)).test(String(value)) ? 1 : 0;
+        } catch {
+          return 0;
+        }
+      }
+    );
   }
 
   /**
