@@ -4,8 +4,7 @@
       "Bash(npm run *)",
       "Bash(netstat -ano)",
       "Bash(xargs grep *)",
-      "Bash(npx tsc *)",
-      "PowerShell(Stop-Process *)"
+      "Bash(npm install *)"
     ]
   }
 }

@@ -7,8 +7,9 @@ Do not point production users at this.
 
 ## Milestone status
 
-- **M1 (this dir) — scaffold.** Schema is a `users` stub; `ping` query works.
-- M2 — notes + content sync.
+- **M1 — scaffold.** `ping` query works. ✅
+- **M2 — notes + content backend.** Schema + upsert/remove/changesSince for `notes` and `contents`. ✅
+  Client wiring (`ConvexTransport` in `@notesnook/core`) lands in M2b.
 - M3 — remaining collections (notebooks, tags, colors, reminders, etc.).
 - M4 — Convex File Storage for attachments.
 - M5 — live subscriptions + real auth (JWTs from `auth.streetwriters.co`).

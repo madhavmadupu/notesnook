@@ -20,16 +20,67 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
-// M1 scaffold: only the `users` table exists.
-// Collections for notes, content, notebooks, tags, etc. land in M2+.
+// Mirrors `Note` in packages/core/src/types.ts, minus deprecated and
+// client-local fields (migrated, remote, synced, topic, tags, color,
+// notebooks, locked, deleteReason, dateDeleted/itemType/deletedBy which
+// are always null on notes).
 //
-// Identity model (M1-M2): `externalId` is a dev user token supplied by the
-// client via env (NN_CONVEX_DEV_USER). It is NOT a JWT and gives no real
-// auth — it only segments data during development. Wired to real identity
-// from auth.streetwriters.co at M5.
+// Everything except the identity/timestamp triple is optional at the
+// schema level so deletion tombstones can omit content fields.
+// Non-deleted upserts must populate the full set — enforced by the
+// upsert mutation's argument validator, not the schema.
+const noteDoc = {
+  userKey: v.string(),
+  id: v.string(),
+  dateCreated: v.number(),
+  dateModified: v.number(),
+  dateEdited: v.optional(v.number()),
+
+  title: v.optional(v.string()),
+  headline: v.optional(v.string()),
+  contentId: v.optional(v.string()),
+  pinned: v.optional(v.boolean()),
+  favorite: v.optional(v.boolean()),
+  localOnly: v.optional(v.boolean()),
+  conflicted: v.optional(v.boolean()),
+  readonly: v.optional(v.boolean()),
+  archived: v.optional(v.boolean()),
+  isGeneratedTitle: v.optional(v.boolean()),
+  expiryDate: v.optional(
+    v.object({
+      dateModified: v.number(),
+      value: v.union(v.number(), v.null())
+    })
+  ),
+
+  deleted: v.optional(v.boolean())
+};
+
+// Mirrors `UnencryptedContentItem`. `locked` is intentionally absent —
+// this fork stores plaintext only.
+const contentDoc = {
+  userKey: v.string(),
+  id: v.string(),
+  noteId: v.string(),
+  dateCreated: v.number(),
+  dateModified: v.number(),
+  dateEdited: v.optional(v.number()),
+
+  type: v.optional(v.union(v.literal("tiptap"), v.literal("tiny"))),
+  data: v.optional(v.string()),
+  localOnly: v.optional(v.boolean()),
+  sessionId: v.optional(v.string()),
+
+  deleted: v.optional(v.boolean())
+};
+
 export default defineSchema({
-  users: defineTable({
-    externalId: v.string(),
-    createdAt: v.number()
-  }).index("byExternalId", ["externalId"])
+  notes: defineTable(noteDoc)
+    .index("by_userKey_and_id", ["userKey", "id"])
+    .index("by_userKey_and_dateModified", ["userKey", "dateModified"]),
+
+  contents: defineTable(contentDoc)
+    .index("by_userKey_and_id", ["userKey", "id"])
+    .index("by_userKey_and_noteId", ["userKey", "noteId"])
+    .index("by_userKey_and_dateModified", ["userKey", "dateModified"])
 });
